@@ -1,0 +1,142 @@
+---
+title: "bbs_phenology"
+author: "Conor McMahon"
+date: "2025-07-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.width = 6, fig.height = 4)
+library(tidyverse)
+
+```
+
+
+First, lets load the data.
+
+```{r load_data, warning=FALSE}
+
+bbs <- read_csv("bird_data/sb_bbs_20250714.csv") %>% 
+  janitor::clean_names() %>%
+  mutate(observation_date = lubridate::dmy(observation_date),
+     doy = lubridate::yday(observation_date),
+     year = lubridate::year(observation_date),
+     first_day_in_year = lubridate::ymd(paste(year, 1, 1, sep="-")),
+     date_without_year = as.Date("1970-01-01") + (observation_date - first_day_in_year))
+
+```
+
+Now, we can generate some simple summary histograms showing the range of seasonality across birds. 
+
+We'll try using pairs of species which are closely related, for which one is a riparian breeder.
+
+```{r paired_plots, warning=FALSE}
+
+sparrow_plot <- ggplot(bbs %>% filter(common_name %in% c("Dark-eyed Junco", "Song Sparrow"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Dark-eyed Junco", "Song Sparrow")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Dark-eyed Junco"="forestgreen", "Song Sparrow"="blue"))
+ggsave("plots/sparrow_phenology.png", sparrow_plot, width = 6, height = 4)
+sparrow_plot
+
+finch_plot <- ggplot(bbs %>% filter(common_name %in% c("House Finch", "Purple Finch"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("House Finch", "Purple Finch")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("House Finch"="forestgreen", "Purple Finch"="blue"))
+ggsave("plots/finch_phenology.png", finch_plot, width = 6, height = 4)
+finch_plot
+
+parid_plot <- ggplot(bbs %>% filter(common_name %in% c("Oak Titmouse", "Chestnut-backed Chickadee"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Oak Titmouse", "Chestnut-backed Chickadee")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Oak Titmouse"="forestgreen", "Chestnut-backed Chickadee"="blue"))
+ggsave("plots/parid_phenology.png", parid_plot, width = 6, height = 4)
+parid_plot
+
+thrush_plot <- ggplot(bbs %>% filter(common_name %in% c("Western Bluebird", "Swainson's Thrush"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Western Bluebird", "Swainson's Thrush")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Western Bluebird"="forestgreen", "Swainson's Thrush"="blue"))
+ggsave("plots/thrush_phenology.png", thrush_plot, width = 6, height = 4)
+thrush_plot
+
+passerina_plot <- ggplot(bbs %>% filter(common_name %in% c("Lazuli Bunting", "Blue Grosbeak"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Lazuli Bunting", "Blue Grosbeak")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Lazuli Bunting"="forestgreen", "Blue Grosbeak"="blue"))
+ggsave("plots/passerina_phenology.png", passerina_plot, width = 6, height = 4)
+passerina_plot
+
+warbler_plot <- ggplot(bbs %>% filter(common_name %in% c("Wilson's Warbler", "Orange-crowned Warbler", "Yellow Warbler"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Orange-crowned Warbler", "Wilson's Warbler", "Yellow Warbler")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Orange-crowned Warbler"="forestgreen", "Wilson's Warbler"="blue", "Yellow Warbler"="cyan3"))
+ggsave("plots/warbler_phenology.png", warbler_plot, width = 6, height = 4)
+warbler_plot
+
+vireo_plot <- ggplot(bbs %>% filter(common_name %in% c("Hutton's Vireo", "Warbling Vireo"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Hutton's Vireo", "Warbling Vireo")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Hutton's Vireo"="forestgreen", "Warbling Vireo"="blue"))
+ggsave("plots/vireo_phenology.png", vireo_plot, width = 6, height = 4)
+vireo_plot
+
+riparian_species <- c("Warbling Vireo", "Yellow Warbler", "Wilson's Warbler", "Purple Finch", "Swainson's Thrush", "Willow Flycatcher", "Chestnut-backed Chickadee")
+
+all_riparian_plot <- ggplot(bbs %>% filter(common_name %in% c("Hutton's Vireo", "Warbling Vireo"))) + 
+  geom_density(aes(x=date_without_year, group=common_name, col=factor(common_name, levels=c("Hutton's Vireo", "Warbling Vireo")))) + 
+  scale_x_date(date_labels = "%b",
+               breaks = lubridate::ymd(paste(1970, 2:9, 1, sep="-"))) + 
+  xlab('Month') + 
+  ylab('Frequency of Breeding Records') + 
+  theme_bw() + 
+  theme(legend.position="bottom") + 
+  guides(col=guide_legend(title="Species")) + 
+  scale_color_manual(values=c("Hutton's Vireo"="forestgreen", "Warbling Vireo"="blue"))
+ggsave("plots/all_riparian_phenology.png", all_riparian_plot, width = 6, height = 4)
+all_riparian_plot
+
+```
